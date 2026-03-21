@@ -25,10 +25,12 @@ jobs:
 
       # 3. Restore dependencies
       - name: Restore dependencies
+        working-directory: jotit
         run: dotnet restore
 
       # 4. Build project
       - name: Build
+        working-directory: jotit
         run: dotnet build --configuration Release --no-restore
 
       # 5. Run tests
@@ -37,6 +39,7 @@ jobs:
 
       # 6. Publish application
       - name: Publish
+        working-directory: jotit
         run: dotnet publish -c Release -o ./publish
 
       # 7. Create GitHub Release
