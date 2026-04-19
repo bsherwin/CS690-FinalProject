@@ -119,4 +119,35 @@ public class ItemRepository
         command.Parameters.AddWithValue("$id", id);
         return command.ExecuteNonQuery() > 0;
     }
+
+    public bool UpdateDueDate(long id, string? dueDate)
+    {
+        using var connection = Open();
+        var command = connection.CreateCommand();
+        command.CommandText = "UPDATE Items SET DueDate = $dueDate WHERE Id = $id";
+        command.Parameters.AddWithValue("$dueDate", dueDate ?? (object)DBNull.Value);
+        command.Parameters.AddWithValue("$id", id);
+        return command.ExecuteNonQuery() > 0;
+    }
+
+    public Item? GetItemById(long id)
+    {
+        using var connection = Open();
+        var command = connection.CreateCommand();
+        command.CommandText = "SELECT Id, Body, Category, DueDate FROM Items WHERE Id = $id";
+        command.Parameters.AddWithValue("$id", id);
+
+        using var reader = command.ExecuteReader();
+        if (!reader.Read()) return null;
+
+        long itemId = reader.GetInt64(0);
+        string body = reader.GetString(1);
+        string category = reader.IsDBNull(2) ? "" : reader.GetString(2);
+        string? dueDate = reader.IsDBNull(3) ? null : reader.GetString(3);
+
+        if (dueDate is not null)
+            return new TaskItem { Id = itemId, Body = body, Category = category, DueDate = dueDate };
+
+        return new NoteItem { Id = itemId, Body = body, Category = category };
+    }
 }
