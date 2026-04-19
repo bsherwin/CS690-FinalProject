@@ -9,9 +9,10 @@ while (running)
     Console.WriteLine();
     Console.WriteLine("=== JotIt ===");
     Console.WriteLine("1. Add");
-    Console.WriteLine("2. List");
-    Console.WriteLine("3. Delete");
-    Console.WriteLine("4. Quit");
+    Console.WriteLine("2. Change");
+    Console.WriteLine("3. List");
+    Console.WriteLine("4. Delete");
+    Console.WriteLine("5. Quit");
     Console.Write("Select an option: ");
 
     string? choice = Console.ReadLine();
@@ -19,37 +20,18 @@ while (running)
     switch (choice)
     {
         case "1":
-            Console.WriteLine();
-            Console.WriteLine("--- Add ---");
-            Console.WriteLine("1. New Note");
-            Console.WriteLine("2. New Task");
-            Console.WriteLine("3. Back");
-            Console.Write("Select an option: ");
-
-            string? addChoice = Console.ReadLine();
-
-            switch (addChoice)
-            {
-                case "1":
-                    AddNote();
-                    break;
-                case "2":
-                    AddTask();
-                    break;
-                case "3":
-                    break;
-                default:
-                    Console.WriteLine("Invalid option. Please try again.");
-                    break;
-            }
+            AddItem();
             break;
         case "2":
-            ListItems();
+            ChangeItem();
             break;
         case "3":
-            DeleteItem();
+            ListItems();
             break;
         case "4":
+            DeleteItem();
+            break;
+        case "5":
             running = false;
             break;
         default:
@@ -59,6 +41,87 @@ while (running)
 }
 
 Console.WriteLine("Goodbye!");
+
+void AddItem() {
+    Console.WriteLine();
+    Console.WriteLine("--- Add ---");
+    Console.WriteLine("1. New Note");
+    Console.WriteLine("2. New Task");
+    Console.WriteLine("3. Back");
+    Console.Write("Select an option: ");
+
+    string? addChoice = Console.ReadLine();
+
+    switch (addChoice)
+    {
+        case "1":
+            AddNote();
+            break;
+        case "2":
+            AddTask();
+            break;
+        case "3":
+            break;
+        default:
+            Console.WriteLine("Invalid option. Please try again.");
+            break;
+    }
+}
+
+void ChangeItem()
+{
+    new NoteCollection(repo).Display();
+    new TaskCollection(repo).Display();
+
+    Console.WriteLine();
+    Console.Write("Enter the ID of the item to delete (or 0 to cancel): ");
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int id) || id <= 0)
+    {
+        if (id != 0)
+            Console.WriteLine("Invalid ID.");
+        return;
+    }
+
+    var item = repo.GetItemById(id) ?? throw new Exception("No item found with that ID.");
+
+    if (item is NoteItem note)
+        ConvertNoteToTask(item as NoteItem);
+    else
+        ConvertTaskToNote(item as TaskItem);
+}
+
+void ConvertNoteToTask(NoteItem note)
+{
+    Console.WriteLine();
+    Console.WriteLine($"[{note.Id}] {note.Body} ({(string.IsNullOrEmpty(note.Category) ? "No Category" : note.Category)})");
+
+    Console.Write($"Enter due date (yyyy-MM-dd) [{DateTime.Today:yyyy-MM-dd}]: ");
+    string? dueDateInput = Console.ReadLine();
+
+    if (string.IsNullOrWhiteSpace(dueDateInput))
+    {
+        dueDateInput = DateTime.Today.ToString("yyyy-MM-dd");
+    }
+    else if (!DateTime.TryParseExact(dueDateInput, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out _))
+    {
+        Console.WriteLine("Invalid date format.");
+        return;
+    }
+
+    repo.UpdateDueDate(note.Id, dueDateInput);
+    Console.WriteLine("Note converted to task.");
+}
+
+void ConvertTaskToNote(TaskItem task)
+{
+    Console.WriteLine();
+    Console.WriteLine($"[{task.Id}] {task.Body} ({(string.IsNullOrEmpty(task.Category) ? "No Category" : task.Category)})");
+
+    repo.UpdateDueDate(task.Id, null);
+    Console.WriteLine("Task converted to note.");
+}
 
 void AddNote()
 {
