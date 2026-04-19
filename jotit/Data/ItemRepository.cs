@@ -67,7 +67,7 @@ public class ItemRepository
                 WHEN 'Home' THEN 2 
                 WHEN 'Personal' THEN 3 
                 ELSE 4 
-            END, CreatedAt ASC";
+            END";
 
         using var reader = command.ExecuteReader();
         var notes = new List<NoteItem>();
