@@ -64,4 +64,62 @@ public class ItemRepositoryTests : IDisposable
         var tasks = _repository.GetTasks();
         Assert.Empty(tasks);
     }
+
+    [Fact]
+    public void Delete_ShouldReturnTrue_WhenItemExists()
+    {
+        _repository.Add(new NoteItem { Body = "To delete", Category = "" });
+        var id = _repository.GetNotes()[0].Id;
+
+        var result = _repository.Delete(id);
+
+        Assert.True(result);
+        Assert.Empty(_repository.GetNotes());
+    }
+
+    [Fact]
+    public void Delete_ShouldReturnFalse_WhenItemDoesNotExist()
+    {
+        var result = _repository.Delete(9999);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void GetNotes_ShouldReturnNotes_SortedByCategoryPriority()
+    {
+        _repository.Add(new NoteItem { Body = "Personal note", Category = "Personal" });
+        _repository.Add(new NoteItem { Body = "Work note", Category = "Work" });
+        _repository.Add(new NoteItem { Body = "Home note", Category = "Home" });
+
+        var notes = _repository.GetNotes();
+
+        Assert.Equal("Work note", notes[0].Body);
+        Assert.Equal("Home note", notes[1].Body);
+        Assert.Equal("Personal note", notes[2].Body);
+    }
+
+    [Fact]
+    public void GetTasks_ShouldReturnTasks_SortedByDueDate()
+    {
+        _repository.Add(new TaskItem { Body = "Later task", Category = "Work", DueDate = "2026-12-31" });
+        _repository.Add(new TaskItem { Body = "Earlier task", Category = "Work", DueDate = "2026-06-01" });
+
+        var tasks = _repository.GetTasks();
+
+        Assert.Equal("Earlier task", tasks[0].Body);
+        Assert.Equal("Later task", tasks[1].Body);
+    }
+
+    [Fact]
+    public void GetNotes_ShouldReturnEmpty_WhenNoNotesExist()
+    {
+        Assert.Empty(_repository.GetNotes());
+    }
+
+    [Fact]
+    public void GetTasks_ShouldReturnEmpty_WhenNoTasksExist()
+    {
+        Assert.Empty(_repository.GetTasks());
+    }
 }
