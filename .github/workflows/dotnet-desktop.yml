@@ -38,9 +38,23 @@ jobs:
       #   run: dotnet test --no-build --verbosity normal
 
       # 6. Publish application
-      - name: Publish
+      - name: Publish (win-x64)
         working-directory: jotit
-        run: dotnet publish -c Release -o ./publish
+        run: dotnet publish -c Release -r win-x64 -o ./publish/win-x64
+      - name: Zip (win-x64)
+        run: zip -r jotit/publish/win-x64.zip jotit/publish/win-x64/
+
+      - name: Publish (linux-x64)
+        working-directory: jotit
+        run: dotnet publish -c Release -r linux-x64 -o ./publish/linux-x64
+      - name: Zip (linux-x64)
+        run: zip -r jotit/publish/linux-x64.zip jotit/publish/linux-x64/
+      
+      - name: Publish (osx-x64)
+        working-directory: jotit
+        run: dotnet publish -c Release -r osx-x64 -o ./publish/osx-x64
+      - name: Zip (osx-x64)
+        run: zip -r jotit/publish/osx-x64.zip jotit/publish/osx-x64/
 
       # 7. Create GitHub Release
       - name: Create Release
@@ -60,6 +74,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
-          files: jotit/publish/**
+          files: |
+            jotit/publish/win-x64.zip
+            jotit/publish/linux-x64.zip
+            jotit/publish/osx-x64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
