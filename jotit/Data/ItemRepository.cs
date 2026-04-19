@@ -23,8 +23,7 @@ public class ItemRepository
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Body TEXT NOT NULL,
                 Category TEXT NOT NULL DEFAULT '',
-                DueDate TEXT,
-                CreatedAt TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+                DueDate TEXT NULL
             )";
         command.ExecuteNonQuery();
     }

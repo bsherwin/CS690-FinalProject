@@ -37,4 +37,6 @@ public class NoteItem : Item
 
         return new NoteItem { Body = body, Category = category };
     }
+
+    
 }

@@ -30,7 +30,7 @@ public class NoteCollection
             string cat = maxCat > 0
                 ? (string.IsNullOrEmpty(note.Category) ? "".PadRight(maxCat + 2) : $"[{note.Category}]".PadRight(maxCat + 2))
                 : "";
-            Console.WriteLine($"  [{id}]  {cat}  {note.Body}");
+            Console.WriteLine($"[{id}]  [{cat}]  {note.Body}");
         }
     }
 }

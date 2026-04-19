@@ -32,7 +32,7 @@ public class TaskCollection
                 ? (string.IsNullOrEmpty(task.Category) ? "".PadRight(maxCat + 2) : $"[{task.Category}]".PadRight(maxCat + 2))
                 : "";
             string body = task.Body.PadRight(maxBody);
-            Console.WriteLine($"  [{id}]  {cat}  {body}  (Due: {task.DueDate})");
+            Console.WriteLine($"[{id}]  [{cat}]  {body}  (Due: {task.DueDate})");
         }
     }
 }

@@ -73,7 +73,7 @@ int SelectNoteOrTask() {
     new TaskCollection(repo).Display();
 
     Console.WriteLine();
-    Console.Write("Enter the ID of the item to delete (or 0 to cancel): ");
+    Console.Write("Enter item ID (or 0 to cancel): ");
     string? input = Console.ReadLine();
 
     if (!int.TryParse(input, out int id) || id <= 0)
@@ -88,6 +88,7 @@ int SelectNoteOrTask() {
 void ChangeItem()
 {
     int id = SelectNoteOrTask();
+    if (id == 0) return;  // 0 means cancel
 
     var item = repo.GetItemById(id) ?? throw new Exception("No item found with that ID.");
     
@@ -100,7 +101,7 @@ void ChangeItem()
 void ConvertNoteToTask(NoteItem note)
 {
     Console.WriteLine();
-    Console.WriteLine($"[{note.Id}] {note.Body} ({(string.IsNullOrEmpty(note.Category) ? "No Category" : note.Category)})");
+    Console.WriteLine(note.ToString());
 
     Console.Write($"Enter due date (yyyy-MM-dd) [{DateTime.Today:yyyy-MM-dd}]: ");
     string? dueDateInput = Console.ReadLine();
@@ -122,7 +123,7 @@ void ConvertNoteToTask(NoteItem note)
 void ConvertTaskToNote(TaskItem task)
 {
     Console.WriteLine();
-    Console.WriteLine($"[{task.Id}] {task.Body} ({(string.IsNullOrEmpty(task.Category) ? "No Category" : task.Category)})");
+    Console.WriteLine(task.ToString());
 
     repo.UpdateDueDate(task.Id, null);
     Console.WriteLine("Task converted to note.");
@@ -181,6 +182,7 @@ void ListItems()
 void DeleteItem()
 {
     int id = SelectNoteOrTask();
+    if (id == 0) return; // 0 means cancel
 
     if (repo.Delete(id))
         Console.WriteLine("Item deleted.");
