@@ -49,6 +49,7 @@ CodeCoverage/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 coverage*.xml
+*.db
 
 # NUnit
 *.VisualState.xml
