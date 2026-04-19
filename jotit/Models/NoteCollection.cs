@@ -28,7 +28,7 @@ public class NoteCollection
         {
             string id = note.Id.ToString().PadLeft(maxId);
             string cat = maxCat > 0
-                ? (string.IsNullOrEmpty(note.Category) ? "".PadRight(maxCat + 2) : $"{note.Category}".PadRight(maxCat + 2))
+                ? (string.IsNullOrEmpty(note.Category) ? "".PadRight(maxCat) : $"{note.Category}".PadRight(maxCat))
                 : "";
             Console.WriteLine($"[{id}]  [{cat}]  {note.Body}");
         }
