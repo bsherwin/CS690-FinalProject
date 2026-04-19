@@ -37,20 +37,22 @@ public class TaskItem : Item
             return null;
         }
 
-        Console.Write($"Enter due date (yyyy-MM-dd) [{DateTime.Today:yyyy-MM-dd}]: ");
-        string? dueDateInput = Console.ReadLine();
+        string? dueDate = PromptDueDate();
+        if (dueDate == null) return null;
 
-        if (string.IsNullOrWhiteSpace(dueDateInput))
-        {
-            dueDateInput = DateTime.Today.ToString("yyyy-MM-dd");
-        }
-        else if (!DateTime.TryParseExact(dueDateInput, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out _))
+        return new TaskItem { Body = body, Category = category, DueDate = dueDate };
+    }
+
+    public static string? PromptDueDate()
+    {
+        Console.Write($"Enter due date (yyyy-MM-dd) [{DateTime.Today:yyyy-MM-dd}]: ");
+        string? input = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(input)) return DateTime.Today.ToString("yyyy-MM-dd");
+        if (!DateTime.TryParseExact(input, "yyyy-MM-dd", null, DateTimeStyles.None, out _))
         {
             Console.WriteLine("Invalid date format.");
             return null;
         }
-
-        return new TaskItem { Body = body, Category = category, DueDate = dueDateInput };
+        return input;
     }
-
 }

@@ -55,10 +55,12 @@ void AddItem() {
     switch (addChoice)
     {
         case "1":
-            AddNote();
+            var note = NoteItem.Create();
+            if (note != null) { repo.Add(note); Console.WriteLine("Note saved!"); }
             break;
         case "2":
-            AddTask();
+            var task = TaskItem.Create();
+            if (task != null) { repo.Add(task); Console.WriteLine("Task saved!"); }
             break;
         case "3":
             break;
@@ -103,20 +105,9 @@ void ConvertNoteToTask(NoteItem note)
     Console.WriteLine();
     Console.WriteLine(note.ToString());
 
-    Console.Write($"Enter due date (yyyy-MM-dd) [{DateTime.Today:yyyy-MM-dd}]: ");
-    string? dueDateInput = Console.ReadLine();
-
-    if (string.IsNullOrWhiteSpace(dueDateInput))
-    {
-        dueDateInput = DateTime.Today.ToString("yyyy-MM-dd");
-    }
-    else if (!DateTime.TryParseExact(dueDateInput, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out _))
-    {
-        Console.WriteLine("Invalid date format.");
-        return;
-    }
-
-    repo.UpdateDueDate(note.Id, dueDateInput);
+    string? dueDate = TaskItem.PromptDueDate();
+    if (dueDate == null) return;
+    repo.UpdateDueDate(note.Id, dueDate);
     Console.WriteLine("Note converted to task.");
 }
 
@@ -127,24 +118,6 @@ void ConvertTaskToNote(TaskItem task)
 
     repo.UpdateDueDate(task.Id, null);
     Console.WriteLine("Task converted to note.");
-}
-
-void AddNote()
-{
-    var note = NoteItem.Create();
-    if (note == null) return;
-
-    repo.Add(note);
-    Console.WriteLine("Note saved!");
-}
-
-void AddTask()
-{
-    var task = TaskItem.Create();
-    if (task == null) return;
-
-    repo.Add(task);
-    Console.WriteLine("Task saved!");
 }
 
 void ListItems()
