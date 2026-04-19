@@ -48,6 +48,7 @@ CodeCoverage/
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
+coverage*.xml
 
 # NUnit
 *.VisualState.xml
