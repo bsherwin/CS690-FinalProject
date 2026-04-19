@@ -48,7 +48,7 @@ public class TaskItem : Item
         Console.Write($"Enter due date (yyyy-MM-dd) [{DateTime.Today:yyyy-MM-dd}]: ");
         string? input = Console.ReadLine();
         if (string.IsNullOrWhiteSpace(input)) return DateTime.Today.ToString("yyyy-MM-dd");
-        if (!DateTime.TryParseExact(input, "yyyy-MM-dd", null, DateTimeStyles.None, out _))
+        if (!DateTime.TryParseExact(input, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out _))
         {
             Console.WriteLine("Invalid date format.");
             return null;
