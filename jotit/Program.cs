@@ -68,8 +68,7 @@ void AddItem() {
     }
 }
 
-void ChangeItem()
-{
+int SelectNoteOrTask() {
     new NoteCollection(repo).Display();
     new TaskCollection(repo).Display();
 
@@ -81,15 +80,21 @@ void ChangeItem()
     {
         if (id != 0)
             Console.WriteLine("Invalid ID.");
-        return;
+        return 0;
     }
+    return id;
+}
+
+void ChangeItem()
+{
+    int id = SelectNoteOrTask();
 
     var item = repo.GetItemById(id) ?? throw new Exception("No item found with that ID.");
-
+    
     if (item is NoteItem note)
-        ConvertNoteToTask(item as NoteItem);
-    else
-        ConvertTaskToNote(item as TaskItem);
+        ConvertNoteToTask(note);
+    else if (item is TaskItem task)
+        ConvertTaskToNote(task);
 }
 
 void ConvertNoteToTask(NoteItem note)
@@ -175,19 +180,7 @@ void ListItems()
 
 void DeleteItem()
 {
-    new NoteCollection(repo).Display();
-    new TaskCollection(repo).Display();
-
-    Console.WriteLine();
-    Console.Write("Enter the ID of the item to delete (or 0 to cancel): ");
-    string? input = Console.ReadLine();
-
-    if (!int.TryParse(input, out int id) || id <= 0)
-    {
-        if (id != 0)
-            Console.WriteLine("Invalid ID.");
-        return;
-    }
+    int id = SelectNoteOrTask();
 
     if (repo.Delete(id))
         Console.WriteLine("Item deleted.");
