@@ -29,7 +29,7 @@ public class TaskCollection
         {
             string id = task.Id.ToString().PadLeft(maxId);
             string cat = maxCat > 0
-                ? (string.IsNullOrEmpty(task.Category) ? "".PadRight(maxCat + 2) : $"[{task.Category}]".PadRight(maxCat + 2))
+                ? (string.IsNullOrEmpty(task.Category) ? "".PadRight(maxCat + 2) : $"{task.Category}".PadRight(maxCat + 2))
                 : "";
             string body = task.Body.PadRight(maxBody);
             Console.WriteLine($"[{id}]  [{cat}]  {body}  (Due: {task.DueDate})");
