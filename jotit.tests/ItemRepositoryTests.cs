@@ -4,6 +4,7 @@ using Microsoft.Data.Sqlite;
 
 namespace JotIt.Tests;
 
+[Collection("ConsoleTests")]
 public class ItemRepositoryTests : IDisposable
 {
     private readonly ItemRepository _repository;
