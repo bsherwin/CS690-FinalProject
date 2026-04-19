@@ -22,7 +22,7 @@ public class TaskCollection
         }
 
         int maxId = _tasks.Max(t => t.Id.ToString().Length);
-        int maxCat = _tasks.Max(t => t.Category.Length);
+        int maxCat = _tasks.Max(t => t.Category?.Length ?? 0);
         int maxBody = _tasks.Max(t => t.Body.Length);
 
         foreach (var task in _tasks)

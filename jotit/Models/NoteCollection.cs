@@ -22,7 +22,7 @@ public class NoteCollection
         }
 
         int maxId = _notes.Max(n => n.Id.ToString().Length);
-        int maxCat = _notes.Max(n => n.Category.Length);
+        int maxCat = _notes.Max(n => n.Category?.Length ?? 0);
 
         foreach (var note in _notes)
         {
