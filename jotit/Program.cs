@@ -50,7 +50,6 @@ while (running)
 
 Console.WriteLine("Goodbye!");
 
-
 void AddItem() {
     Console.WriteLine();
     Console.WriteLine("--- Add ---");
@@ -65,30 +64,12 @@ void AddItem() {
     {
         case "1":
         {
-            string? body = Prompts.GetBody();
-            if (body == null) return;
-            string? category = Prompts.GetCategory();
-            var note = NoteItem.Create(body, category);
-            if (note != null) { repo.Add(note); Console.WriteLine("Note saved!"); }
+            AddNote();
             break;
         }
         case "2":
         {
-            string? body = Prompts.GetBody();
-            if (body == null) return;
-            string? category = Prompts.GetCategory();
-            string? dueDate = Prompts.GetDueDate();
-            if (dueDate == null) {
-                var note = NoteItem.Create(body, category);
-                if (note != null) { 
-                    repo.Add(note);
-                    Console.WriteLine("Task created as a note due to invalid date.");
-                    Console.WriteLine("Note saved!"); 
-                }
-                return;
-            }
-            var task = TaskItem.Create(body, category, dueDate);
-            if (task != null) { repo.Add(task); Console.WriteLine("Task saved!"); }
+            AddTask();
             break;
         }
         case "3":
@@ -97,6 +78,34 @@ void AddItem() {
             Console.WriteLine("Invalid option. Please try again.");
             break;
     }
+}
+
+void AddNote()
+{
+    string? body = Prompts.GetBody();
+    if (body == null) return;
+    string? category = Prompts.GetCategory();
+    var note = NoteItem.Create(body, category);
+    if (note != null) { repo.Add(note); Console.WriteLine("Note saved!"); }
+}
+
+void AddTask()
+{
+    string? body = Prompts.GetBody();
+    if (body == null) return;
+    string? category = Prompts.GetCategory();
+    string? dueDate = Prompts.GetDueDate();
+    if (dueDate == null) {
+        var note = NoteItem.Create(body, category);
+        if (note != null) { 
+            repo.Add(note);
+            Console.WriteLine("Task created as a note due to invalid date.");
+            Console.WriteLine("Note saved!"); 
+        }
+        return;
+    }
+    var task = TaskItem.Create(body, category, dueDate);
+    if (task != null) { repo.Add(task); Console.WriteLine("Task saved!"); }
 }
 
 int SelectNoteOrTask() {
@@ -196,5 +205,3 @@ void DeleteItem()
     else
         Console.WriteLine("No item found with that ID.");
 }
-
-
