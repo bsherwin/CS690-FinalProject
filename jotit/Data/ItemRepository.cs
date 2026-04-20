@@ -129,6 +129,16 @@ public class ItemRepository
         return command.ExecuteNonQuery() > 0;
     }
 
+    public bool UpdateCategory(long id, string category)
+    {
+        using var connection = Open();
+        var command = connection.CreateCommand();
+        command.CommandText = "UPDATE Items SET Category = $category WHERE Id = $id";
+        command.Parameters.AddWithValue("$category", category);
+        command.Parameters.AddWithValue("$id", id);
+        return command.ExecuteNonQuery() > 0;
+    }
+
     public Item? GetItemById(long id)
     {
         using var connection = Open();
