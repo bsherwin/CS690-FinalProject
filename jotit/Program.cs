@@ -9,9 +9,10 @@ while (running)
     Console.WriteLine();
     Console.WriteLine("=== JotIt ===");
     Console.WriteLine("1. Add");
-    Console.WriteLine("2. List");
-    Console.WriteLine("3. Delete");
-    Console.WriteLine("4. Quit");
+    Console.WriteLine("2. Change");
+    Console.WriteLine("3. List");
+    Console.WriteLine("4. Delete");
+    Console.WriteLine("5. Quit");
     Console.Write("Select an option: ");
 
     string? choice = Console.ReadLine();
@@ -44,12 +45,15 @@ while (running)
             }
             break;
         case "2":
-            ListItems();
+            ChangeItem();
             break;
         case "3":
-            DeleteItem();
+            ListItems();
             break;
         case "4":
+            DeleteItem();
+            break;
+        case "5":
             running = false;
             break;
         default:
@@ -76,6 +80,52 @@ void AddTask()
 
     repo.Add(task);
     Console.WriteLine("Task saved!");
+}
+
+void ChangeItem()
+{
+    new NoteCollection(repo).Display();
+    new TaskCollection(repo).Display();
+
+    Console.WriteLine();
+    Console.Write("Enter the ID of the item to change (or 0 to cancel): ");
+    string? input = Console.ReadLine();
+
+    if (!int.TryParse(input, out int id) || id <= 0)
+    {
+        if (id != 0)
+            Console.WriteLine("Invalid ID.");
+        return;
+    }
+
+    var item = repo.GetById(id);
+    if (item == null)
+    {
+        Console.WriteLine("No item found with that ID.");
+        return;
+    }
+
+    if (item is NoteItem)
+    {
+        Console.Write($"Enter due date (yyyy-MM-dd) [{DateTime.Today:yyyy-MM-dd}]: ");
+        string? dueDateInput = Console.ReadLine();
+
+        if (string.IsNullOrWhiteSpace(dueDateInput))
+            dueDateInput = DateTime.Today.ToString("yyyy-MM-dd");
+        else if (!DateTime.TryParseExact(dueDateInput, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out _))
+        {
+            Console.WriteLine("Invalid date format.");
+            return;
+        }
+
+        repo.SetDueDate(id, dueDateInput);
+        Console.WriteLine("Note converted to task.");
+    }
+    else
+    {
+        repo.SetDueDate(id, null);
+        Console.WriteLine("Task converted to note.");
+    }
 }
 
 void ListItems()

@@ -68,7 +68,7 @@ public class ItemRepository
                 WHEN 'Home' THEN 2 
                 WHEN 'Personal' THEN 3 
                 ELSE 4 
-            END, CreatedAt ASC";
+            END";
 
         using var reader = command.ExecuteReader();
         var notes = new List<NoteItem>();
@@ -76,9 +76,9 @@ public class ItemRepository
         {
             notes.Add(new NoteItem
             {
-                Id = reader.GetInt64(0),
-                Body = reader.GetString(1),
-                Category = reader.IsDBNull(2) ? "" : reader.GetString(2)
+                Id = (long)reader["Id"],
+                Body = (string)reader["Body"],
+                Category = reader["Category"] == DBNull.Value ? "" : (string)reader["Category"]
             });
         }
         return notes;
@@ -102,13 +102,43 @@ public class ItemRepository
         {
             tasks.Add(new TaskItem
             {
-                Id = reader.GetInt64(0),
-                Body = reader.GetString(1),
-                Category = reader.IsDBNull(2) ? "" : reader.GetString(2),
-                DueDate = reader.GetString(3)
+                Id = (long)reader["Id"],
+                Body = (string)reader["Body"],
+                Category = reader["Category"] == DBNull.Value ? "" : (string)reader["Category"],
+                DueDate = (string)reader["DueDate"]
             });
         }
         return tasks;
+    }
+
+    public Item? GetById(long id)
+    {
+        using var connection = Open();
+        var command = connection.CreateCommand();
+        command.CommandText = "SELECT Id, Body, Category, DueDate FROM Items WHERE Id = $id";
+        command.Parameters.AddWithValue("$id", id);
+
+        using var reader = command.ExecuteReader();
+        if (!reader.Read()) return null;
+
+        long itemId = (long)reader["Id"];
+        string body = (string)reader["Body"];
+        string category = reader["Category"] == DBNull.Value ? "" : (string)reader["Category"];
+
+        if (reader["DueDate"] == DBNull.Value)
+            return new NoteItem { Id = itemId, Body = body, Category = category };
+
+        return new TaskItem { Id = itemId, Body = body, Category = category, DueDate = (string)reader["DueDate"] };
+    }
+
+    public bool SetDueDate(long id, string? dueDate)
+    {
+        using var connection = Open();
+        var command = connection.CreateCommand();
+        command.CommandText = "UPDATE Items SET DueDate = $dueDate WHERE Id = $id";
+        command.Parameters.AddWithValue("$dueDate", dueDate ?? (object)DBNull.Value);
+        command.Parameters.AddWithValue("$id", id);
+        return command.ExecuteNonQuery() > 0;
     }
 
     public bool Delete(long id)
