@@ -104,7 +104,7 @@ void AddTask()
         }
         return;
     }
-    var task = TaskItem.Create(body, category, dueDate);
+    var task = TaskItem.Create(body, dueDate, category);
     if (task != null) { repo.Add(task); Console.WriteLine("Task saved!"); }
 }
 
@@ -161,52 +161,6 @@ void ConvertTaskToNote(TaskItem task)
 
     repo.UpdateDueDate(task.Id, null);
     Console.WriteLine("Task converted to note.");
-}
-
-void ChangeItem()
-{
-    new NoteCollection(repo).Display();
-    new TaskCollection(repo).Display();
-
-    Console.WriteLine();
-    Console.Write("Enter the ID of the item to change (or 0 to cancel): ");
-    string? input = Console.ReadLine();
-
-    if (!int.TryParse(input, out int id) || id <= 0)
-    {
-        if (id != 0)
-            Console.WriteLine("Invalid ID.");
-        return;
-    }
-
-    var item = repo.GetById(id);
-    if (item == null)
-    {
-        Console.WriteLine("No item found with that ID.");
-        return;
-    }
-
-    if (item is NoteItem)
-    {
-        Console.Write($"Enter due date (yyyy-MM-dd) [{DateTime.Today:yyyy-MM-dd}]: ");
-        string? dueDateInput = Console.ReadLine();
-
-        if (string.IsNullOrWhiteSpace(dueDateInput))
-            dueDateInput = DateTime.Today.ToString("yyyy-MM-dd");
-        else if (!DateTime.TryParseExact(dueDateInput, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out _))
-        {
-            Console.WriteLine("Invalid date format.");
-            return;
-        }
-
-        repo.SetDueDate(id, dueDateInput);
-        Console.WriteLine("Note converted to task.");
-    }
-    else
-    {
-        repo.SetDueDate(id, null);
-        Console.WriteLine("Task converted to note.");
-    }
 }
 
 void ListItems()
