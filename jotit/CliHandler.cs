@@ -146,7 +146,8 @@ public class CliHandler(ItemRepository repo)
         }
         else if (typeArg == "task" && item is TaskItem)
         {
-            Console.WriteLine("Item is already a task.");
+            if (!flags.ContainsKey("--due") && !flags.ContainsKey("--category"))
+                Console.WriteLine("Item is already a task.");
         }
         else if (typeArg is null && !flags.ContainsKey("--category") && !flags.ContainsKey("--due"))
         {
@@ -160,9 +161,19 @@ public class CliHandler(ItemRepository repo)
             Console.WriteLine($"Category updated to '{category}'.");
         }
 
-        if (flags.TryGetValue("--due", out string? dueDateFlag) && typeArg == "note")
+        if (flags.TryGetValue("--due", out string? dueDateFlag))
         {
-            Console.WriteLine("Warning: --due is ignored when changing to a note.");
+            if (typeArg == "note")
+                Console.WriteLine("Warning: --due is ignored when changing to a note.");
+            else if (item is NoteItem && typeArg is null)
+                Console.WriteLine($"Error: item {id} is a note and cannot have a due date. To convert it to a task, run: jotit change {id} task --due {dueDateFlag}");
+            else if (item is TaskItem)
+            {
+                string? dueDate = Prompts.GetDueDate(dueDateFlag);
+                if (dueDate is null) return;
+                repo.UpdateDueDate(id, dueDate);
+                Console.WriteLine($"Due date updated to '{dueDate}'.");
+            }
         }
     }
 
