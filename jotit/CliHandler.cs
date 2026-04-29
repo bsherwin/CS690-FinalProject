@@ -62,7 +62,7 @@ public class CliHandler(ItemRepository repo)
             case "task":
                 string? dueDate = Prompts.GetDueDate(flags.GetValueOrDefault("--due", DateTime.Today.ToString("yyyy-MM-dd")));
                 if (dueDate is null) return;
-                var task = TaskItem.Create(body, category, dueDate);
+                var task = TaskItem.Create(body, dueDate, category);
                 if (task == null) return;
                 repo.Add(task);
                 Console.WriteLine("Task saved!");
