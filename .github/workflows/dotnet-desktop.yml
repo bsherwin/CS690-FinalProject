@@ -42,19 +42,19 @@ jobs:
         working-directory: jotit
         run: dotnet publish -c Release -r win-x64 -o ./publish/win-x64
       - name: Zip (win-x64)
-        run: zip -r jotit/publish/win-x64.zip jotit/publish/win-x64/
+        run: cd jotit/publish/win-x64 && zip -r ../win-x64.zip .
 
       - name: Publish (linux-x64)
         working-directory: jotit
         run: dotnet publish -c Release -r linux-x64 -o ./publish/linux-x64
       - name: Zip (linux-x64)
-        run: zip -r jotit/publish/linux-x64.zip jotit/publish/linux-x64/
+        run: cd jotit/publish/linux-x64 && zip -r ../linux-x64.zip .
       
       - name: Publish (osx-x64)
         working-directory: jotit
         run: dotnet publish -c Release -r osx-x64 -o ./publish/osx-x64
       - name: Zip (osx-x64)
-        run: zip -r jotit/publish/osx-x64.zip jotit/publish/osx-x64/
+        run: cd jotit/publish/osx-x64 && zip -r ../osx-x64.zip .
 
       # 7. Create GitHub Release
       - name: Create Release

@@ -22,15 +22,15 @@ public class NoteCollection
         }
 
         int maxId = _notes.Max(n => n.Id.ToString().Length);
-        int maxCat = _notes.Max(n => n.Category.Length);
+        int maxCat = _notes.Max(n => n.Category?.Length ?? 0);
 
         foreach (var note in _notes)
         {
             string id = note.Id.ToString().PadLeft(maxId);
             string cat = maxCat > 0
-                ? (string.IsNullOrEmpty(note.Category) ? "".PadRight(maxCat + 2) : $"[{note.Category}]".PadRight(maxCat + 2))
+                ? (string.IsNullOrEmpty(note.Category) ? "".PadRight(maxCat) : $"{note.Category}".PadRight(maxCat))
                 : "";
-            Console.WriteLine($"  [{id}]  {cat}  {note.Body}");
+            Console.WriteLine($"[{id}]  [{cat}]  {note.Body}");
         }
     }
 }

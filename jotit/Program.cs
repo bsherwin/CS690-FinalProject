@@ -1,7 +1,15 @@
-﻿using JotIt.Data;
+﻿using JotIt;
+using JotIt.Data;
 using JotIt.Models;
 
 var repo = new ItemRepository("jotit.db");
+
+if (args.Length > 0)
+{
+    new CliHandler(repo).Handle(args);
+    return;
+}
+
 bool running = true;
 
 while (running)
@@ -55,11 +63,15 @@ void AddItem() {
     switch (addChoice)
     {
         case "1":
+        {
             AddNote();
             break;
+        }
         case "2":
+        {
             AddTask();
             break;
+        }
         case "3":
             break;
         default:
@@ -68,77 +80,87 @@ void AddItem() {
     }
 }
 
-void ChangeItem()
+void AddNote()
 {
+    string? body = Prompts.GetBody();
+    if (body == null) return;
+    string? category = Prompts.GetCategory();
+    var note = NoteItem.Create(body, category);
+    if (note != null) { repo.Add(note); Console.WriteLine("Note saved!"); }
+}
+
+void AddTask()
+{
+    string? body = Prompts.GetBody();
+    if (body == null) return;
+    string? category = Prompts.GetCategory();
+    string? dueDate = Prompts.GetDueDate();
+    if (dueDate == null) {
+        var note = NoteItem.Create(body, category);
+        if (note != null) { 
+            repo.Add(note);
+            Console.WriteLine("Task created as a note due to invalid date.");
+            Console.WriteLine("Note saved!"); 
+        }
+        return;
+    }
+    var task = TaskItem.Create(body, dueDate, category);
+    if (task != null) { repo.Add(task); Console.WriteLine("Task saved!"); }
+}
+
+int SelectNoteOrTask() {
     new NoteCollection(repo).Display();
     new TaskCollection(repo).Display();
 
     Console.WriteLine();
-    Console.Write("Enter the ID of the item to delete (or 0 to cancel): ");
+    Console.Write("Enter item ID (or 0 to cancel): ");
     string? input = Console.ReadLine();
 
     if (!int.TryParse(input, out int id) || id <= 0)
     {
         if (id != 0)
             Console.WriteLine("Invalid ID.");
+        return 0;
+    }
+    return id;
+}
+
+void ChangeItem()
+{
+    int id = SelectNoteOrTask();
+    if (id == 0) return;  // 0 means cancel
+
+    var item = repo.GetItemById(id);
+    if (item == null)
+    {
+        Console.WriteLine("No item found with that ID.");
         return;
     }
 
-    var item = repo.GetItemById(id) ?? throw new Exception("No item found with that ID.");
-
     if (item is NoteItem note)
-        ConvertNoteToTask(item as NoteItem);
-    else
-        ConvertTaskToNote(item as TaskItem);
+        ConvertNoteToTask(note);
+    else if (item is TaskItem task)
+        ConvertTaskToNote(task);
 }
 
 void ConvertNoteToTask(NoteItem note)
 {
     Console.WriteLine();
-    Console.WriteLine($"[{note.Id}] {note.Body} ({(string.IsNullOrEmpty(note.Category) ? "No Category" : note.Category)})");
+    Console.WriteLine(note.ToString());
 
-    Console.Write($"Enter due date (yyyy-MM-dd) [{DateTime.Today:yyyy-MM-dd}]: ");
-    string? dueDateInput = Console.ReadLine();
-
-    if (string.IsNullOrWhiteSpace(dueDateInput))
-    {
-        dueDateInput = DateTime.Today.ToString("yyyy-MM-dd");
-    }
-    else if (!DateTime.TryParseExact(dueDateInput, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out _))
-    {
-        Console.WriteLine("Invalid date format.");
-        return;
-    }
-
-    repo.UpdateDueDate(note.Id, dueDateInput);
+    string? dueDate = Prompts.GetDueDate();
+    if (dueDate == null) return;
+    repo.UpdateDueDate(note.Id, dueDate);
     Console.WriteLine("Note converted to task.");
 }
 
 void ConvertTaskToNote(TaskItem task)
 {
     Console.WriteLine();
-    Console.WriteLine($"[{task.Id}] {task.Body} ({(string.IsNullOrEmpty(task.Category) ? "No Category" : task.Category)})");
+    Console.WriteLine(task.ToString());
 
     repo.UpdateDueDate(task.Id, null);
     Console.WriteLine("Task converted to note.");
-}
-
-void AddNote()
-{
-    var note = NoteItem.Create();
-    if (note == null) return;
-
-    repo.Add(note);
-    Console.WriteLine("Note saved!");
-}
-
-void AddTask()
-{
-    var task = TaskItem.Create();
-    if (task == null) return;
-
-    repo.Add(task);
-    Console.WriteLine("Task saved!");
 }
 
 void ListItems()
@@ -175,19 +197,8 @@ void ListItems()
 
 void DeleteItem()
 {
-    new NoteCollection(repo).Display();
-    new TaskCollection(repo).Display();
-
-    Console.WriteLine();
-    Console.Write("Enter the ID of the item to delete (or 0 to cancel): ");
-    string? input = Console.ReadLine();
-
-    if (!int.TryParse(input, out int id) || id <= 0)
-    {
-        if (id != 0)
-            Console.WriteLine("Invalid ID.");
-        return;
-    }
+    int id = SelectNoteOrTask();
+    if (id == 0) return; // 0 means cancel
 
     if (repo.Delete(id))
         Console.WriteLine("Item deleted.");

@@ -22,17 +22,17 @@ public class TaskCollection
         }
 
         int maxId = _tasks.Max(t => t.Id.ToString().Length);
-        int maxCat = _tasks.Max(t => t.Category.Length);
+        int maxCat = _tasks.Max(t => t.Category?.Length ?? 0);
         int maxBody = _tasks.Max(t => t.Body.Length);
 
         foreach (var task in _tasks)
         {
             string id = task.Id.ToString().PadLeft(maxId);
             string cat = maxCat > 0
-                ? (string.IsNullOrEmpty(task.Category) ? "".PadRight(maxCat + 2) : $"[{task.Category}]".PadRight(maxCat + 2))
+                ? (string.IsNullOrEmpty(task.Category) ? "".PadRight(maxCat) : $"{task.Category}".PadRight(maxCat))
                 : "";
             string body = task.Body.PadRight(maxBody);
-            Console.WriteLine($"  [{id}]  {cat}  {body}  (Due: {task.DueDate})");
+            Console.WriteLine($"[{id}]  [{cat}]  {body}  (Due: {task.DueDate})");
         }
     }
 }
